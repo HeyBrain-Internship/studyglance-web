@@ -26,7 +26,7 @@ function MainPage()
         setIsStartPage(false);
         try
         {
-            const response = await fetch("http://localhost:8080/get");
+            const response = await fetch("https://studyglance.space/api/get");
             const data = await response.json();
             console.log(data);
         }
