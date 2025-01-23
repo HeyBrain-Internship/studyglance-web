@@ -1,0 +1,13 @@
+name: Deploy frontend (deploy.dyzoon.dev)
+'on':
+  workflow_dispatch: null
+jobs:
+  deploy:
+    name: Call redeployment webhook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute webhook
+        uses: joelwmale/webhook-action@master
+        with:
+          url: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+          body: '{}'
