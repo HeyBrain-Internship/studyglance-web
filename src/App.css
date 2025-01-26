@@ -64,7 +64,8 @@
 
 .button-answer
 {
-    width : 150pt;
+    width : 300pt;
+    margin : 10pt;
 }
 
 .button-report

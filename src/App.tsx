@@ -1,44 +1,140 @@
-import React, {useState} from 'react';
-import './App.css';
+import React, { useRef, useState } from "react";
+import "./App.css";
 
 function MainPage()
 {
-    const [isStartPage, setIsStartPage]   = useState<boolean>(true);
-    const [selectedItem, setSelectedItem] = useState('');
-    const items                           = ['Grade Kindergarten',
-                                             'Grade 1',
-                                             'Grade 2',
-                                             'Grade 3',
-                                             'Grade 4',
-                                             'Grade 5',
-                                             'Grade 6',
-                                             'Grade 7',
-                                             'Grade 8'];
+    type Data = [number, string, string, string, string, string, string, string, string, string, number][];
+
+    const [isStartPage, setIsStartPage]       = useState<boolean>(true);
+    const [selectedItem, setSelectedItem]     = useState("");
+    const [data, setData]                     = useState<Data>([]); // Сделать data состоянием компонента
+    const [questionNumber, setQuestionNumber] = useState(0);
+    const items                               = [
+        "Grade Kindergarten",
+        "Grade 1",
+        "Grade 2",
+        "Grade 3",
+        "Grade 4",
+        "Grade 5",
+        "Grade 6",
+        "Grade 7",
+        "Grade 8"
+    ];
+    const [title, setTitle]                   = useState<string>("");
+    const [question, setQuestion]             = useState<string>("");
+    const [answer_1, setAnswer_1]             = useState<string>("");
+    const [answer_2, setAnswer_2]             = useState<string>("");
+    const [answer_3, setAnswer_3]             = useState<string>("");
+    const [answer_4, setAnswer_4]             = useState<string>("");
+    const [answerRight, setAnswerRight]       = useState<number>(0);
+    const [result, setResult]                 = useState<{ message : string, color : string }>({
+                                                                                                   message : "",
+                                                                                                   color :   ""
+                                                                                               });
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     const handleChange = (event : React.ChangeEvent<HTMLSelectElement>) =>
     {
         setSelectedItem(event.target.value);
-        console.log('You selected: ', event.target.value);
+        console.log("You selected: ", event.target.value);
     }
 
     const buttonStartClick = async () =>
     {
-        setIsStartPage(false);
+        setResult({ message : "", color : "" });
+
+        let grade : string;
+        //@formatter:off
+        switch (selectedItem)
+        {
+            case "Kindergarten": grade = "grade-kindergarten"; break;
+            case "Grade 1": grade = "grade-1"; break;
+            case "Grade 2": grade = "grade-2"; break;
+            case "Grade 3": grade = "grade-3"; break;
+            case "Grade 4": grade = "grade-4"; break;
+            case "Grade 5": grade = "grade-5"; break;
+            case "Grade 6": grade = "grade-6"; break;
+            case "Grade 7": grade = "grade-7"; break;
+            case "Grade 8": grade = "grade-8"; break;
+            default: grade = "grade-kindergarten"; break;
+        }
+        //@formatter:on
+
         try
         {
-            const response = await fetch("https://studyglance.space/api/get");
-            const data = await response.json();
-            console.log(data);
+            const response     = await fetch("http://127.0.0.1:8080/get/" + grade);
+            const dataImported = await response.json();
+            const newData      = dataImported["receivedData"];
+            console.log("DATA 1", newData);
+
+            setData(newData);
+            setTitle(`${newData[0][2]} / ${newData[0][3]} / ${newData[0][4]}`);
+            setQuestion(`${newData[0][5]}`);
+            setAnswer_1(`${newData[0][6]}`);
+            setAnswer_2(`${newData[0][7]}`);
+            setAnswer_3(`${newData[0][8]}`);
+            setAnswer_4(`${newData[0][9]}`);
+            setAnswerRight(Number(newData[0][10]));
         }
-        catch(error)
+        catch (error)
         {
             console.log(error);
+        }
+
+        setIsStartPage(false);
+    }
+
+    const buttonAnswerClick = (selectedAnswer : number) =>
+    {
+        if (selectedAnswer === answerRight)
+        {
+            setResult({ message : "Right!", color : "lightgreen" });
+            setTimeout(() => nextQuestion(), 2000);
+        }
+        else
+        {
+            //@formatter:off
+            switch (answerRight)
+            {
+                case 1: setResult({ message : `Wrong! Right answer is: ${answer_1}`, color : "red" }); break;
+                case 2: setResult({ message : `Wrong! Right answer is: ${answer_2}`, color : "red" }); break;
+                case 3: setResult({ message : `Wrong! Right answer is: ${answer_3}`, color : "red" }); break;
+                case 4: setResult({ message : `Wrong! Right answer is: ${answer_4}`, color : "red" }); break;
+            }
+            //@formatter:on
+            setTimeout(() => nextQuestion(), 3000);
+        }
+
+    }
+
+    const nextQuestion = () =>
+    {
+        if (questionNumber < data.length - 1)
+        {
+            if (buttonRef.current)
+            {
+                buttonRef.current.blur();
+            }
+
+            const nextQuestionNumber = questionNumber + 1;
+            setQuestionNumber(nextQuestionNumber);
+
+            const nextData = data[nextQuestionNumber];
+            setTitle(`${nextData[2]} / ${nextData[3]} / ${nextData[4]}`);
+            setQuestion(nextData[5]);
+            setAnswer_1(nextData[6]);
+            setAnswer_2(nextData[7]);
+            setAnswer_3(nextData[8]);
+            setAnswer_4(nextData[9]);
+            setAnswerRight(Number(nextData[10]));
+
+            setResult({ message : "", color : "" });
         }
     }
 
     return (
         <div>
-            <div style={{display : isStartPage ? 'block' : 'none'}}>
+            <div style={{ display : isStartPage ? "block" : "none" }}>
                 <label htmlFor="dynamic_dropdown">
                     <h2>Select grade:</h2>
                 </label>
@@ -51,8 +147,7 @@ function MainPage()
                     <option value="" disabled>
                         Select a grade
                     </option>
-                    {items.map((item,
-                                index) => (
+                    {items.map((item, index) => (
                         <option key={index} value={item}>
                             {item}
                         </option>
@@ -62,13 +157,27 @@ function MainPage()
                 <br/>
                 <button onClick={buttonStartClick}>Start</button>
             </div>
-            <div style={{display : isStartPage ? 'none' : 'block'}}>
+            <div style={{ display : isStartPage ? "none" : "block" }}>
                 <p>
-                    <h1>Let's study!</h1>
+                    <h1 style={{color : "pink"}}>Let's study!</h1>
+                    <i>{title}</i>
+                    <h3 style={{color : "yellow"}}>{question}</h3>
                 </p>
+                <div style={{ color : result.color }}>
+                    <h3>{result.message || " "}</h3>
+                </div>
+                <div>
+                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(1)}>{answer_1}</button>
+                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(2)}>{answer_2}</button>
+                </div>
+                <div>
+                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(3)}>{answer_3}</button>
+                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(4)}>{answer_4}</button>
+                </div>
                 <button onClick={() => setIsStartPage(true)}>Back to start menu</button>
             </div>
-        </div>);
+        </div>
+    );
 }
 
 export default MainPage;
