@@ -36,7 +36,6 @@ function MainPage()
     const handleChange = (event : React.ChangeEvent<HTMLSelectElement>) =>
     {
         setSelectedItem(event.target.value);
-        console.log("You selected: ", event.target.value);
     }
 
     const buttonStartClick = async () =>
@@ -65,7 +64,6 @@ function MainPage()
             const response     = await fetch("http://studyglance.space/api/get-" + grade);
             const dataImported = await response.json();
             const newData      = dataImported["receivedData"];
-            console.log("DATA 1", newData);
 
             setData(newData);
             setTitle(`${newData[0][2]} / ${newData[0][3]} / ${newData[0][4]}`);
