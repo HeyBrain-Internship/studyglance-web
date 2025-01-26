@@ -31,7 +31,10 @@ function MainPage()
                                                                                                    message : "",
                                                                                                    color :   ""
                                                                                                });
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_1 = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_2 = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_3 = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_4 = useRef<HTMLButtonElement>(null);
 
     const handleChange = (event : React.ChangeEvent<HTMLSelectElement>) =>
     {
@@ -109,9 +112,12 @@ function MainPage()
     {
         if (questionNumber < data.length - 1)
         {
-            if (buttonRef.current)
+            if (buttonAnswer_1.current || buttonAnswer_2.current || buttonAnswer_3.current || buttonAnswer_4.current)
             {
-                buttonRef.current.blur();
+                buttonAnswer_1.current?.blur();
+                buttonAnswer_2.current?.blur();
+                buttonAnswer_3.current?.blur();
+                buttonAnswer_4.current?.blur();
             }
 
             const nextQuestionNumber = questionNumber + 1;
@@ -165,12 +171,12 @@ function MainPage()
                     <h3>{result.message || " "}</h3>
                 </div>
                 <div>
-                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(1)}>{answer_1}</button>
-                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(2)}>{answer_2}</button>
+                    <button ref={buttonAnswer_1} className="button-answer" onClick={() => buttonAnswerClick(1)}>{answer_1}</button>
+                    <button ref={buttonAnswer_2} className="button-answer" onClick={() => buttonAnswerClick(2)}>{answer_2}</button>
                 </div>
                 <div>
-                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(3)}>{answer_3}</button>
-                    <button ref={buttonRef} className="button-answer" onClick={() => buttonAnswerClick(4)}>{answer_4}</button>
+                    <button ref={buttonAnswer_3} className="button-answer" onClick={() => buttonAnswerClick(3)}>{answer_3}</button>
+                    <button ref={buttonAnswer_4} className="button-answer" onClick={() => buttonAnswerClick(4)}>{answer_4}</button>
                 </div>
                 <button onClick={() => setIsStartPage(true)}>Back to start menu</button>
             </div>
