@@ -61,7 +61,7 @@ function MainPage()
 
         try
         {
-            const response     = await fetch("http://studyglance.space/api/get-" + grade);
+            const response     = await fetch("https://studyglance.space/api/get-" + grade);
             const dataImported = await response.json();
             const newData      = dataImported["receivedData"];
 
