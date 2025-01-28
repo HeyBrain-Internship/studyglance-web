@@ -7,19 +7,17 @@ function MainPage()
 
     const [isStartPage, setIsStartPage]       = useState<boolean>(true);
     const [selectedItem, setSelectedItem]     = useState("");
-    const [data, setData]                     = useState<Data>([]); // Сделать data состоянием компонента
+    const [data, setData]                     = useState<Data>([]);
     const [questionNumber, setQuestionNumber] = useState(0);
-    const items                               = [
-        "Grade Kindergarten",
-        "Grade 1",
-        "Grade 2",
-        "Grade 3",
-        "Grade 4",
-        "Grade 5",
-        "Grade 6",
-        "Grade 7",
-        "Grade 8"
-    ];
+    const items                               = ["Grade Kindergarten",
+                                                 "Grade 1",
+                                                 "Grade 2",
+                                                 "Grade 3",
+                                                 "Grade 4",
+                                                 "Grade 5",
+                                                 "Grade 6",
+                                                 "Grade 7",
+                                                 "Grade 8"];
     const [title, setTitle]                   = useState<string>("");
     const [question, setQuestion]             = useState<string>("");
     const [answer_1, setAnswer_1]             = useState<string>("");
@@ -31,10 +29,10 @@ function MainPage()
                                                                                                    message : "",
                                                                                                    color :   ""
                                                                                                });
-    const buttonAnswer_1 = useRef<HTMLButtonElement>(null);
-    const buttonAnswer_2 = useRef<HTMLButtonElement>(null);
-    const buttonAnswer_3 = useRef<HTMLButtonElement>(null);
-    const buttonAnswer_4 = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_1                      = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_2                      = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_3                      = useRef<HTMLButtonElement>(null);
+    const buttonAnswer_4                      = useRef<HTMLButtonElement>(null);
 
     const handleChange = (event : React.ChangeEvent<HTMLSelectElement>) =>
     {
@@ -64,7 +62,8 @@ function MainPage()
 
         try
         {
-            const response     = await fetch("https://studyglance.space/api/get-" + grade);
+            //const response     = await fetch("https://studyglance.space/api/get-" + grade);
+            const response     = await fetch("http://127.0.0.1:8080/get-" + grade);
             const dataImported = await response.json();
             const newData      = dataImported["receivedData"];
 
@@ -163,20 +162,28 @@ function MainPage()
             </div>
             <div style={{ display : isStartPage ? "none" : "block" }}>
                 <p>
-                    <h1 style={{color : "pink"}}>Let's study!</h1>
+                    <h1 style={{ color : "pink" }}>Let's study!</h1>
                     <i>{title}</i>
-                    <h3 style={{color : "yellow"}}>{question}</h3>
+                    <h3 style={{ color : "yellow" }}>{question}</h3>
                 </p>
                 <div style={{ color : result.color }}>
                     <h3>{result.message || " "}</h3>
                 </div>
                 <div>
-                    <button ref={buttonAnswer_1} className="button-answer" onClick={() => buttonAnswerClick(1)}>{answer_1}</button>
-                    <button ref={buttonAnswer_2} className="button-answer" onClick={() => buttonAnswerClick(2)}>{answer_2}</button>
+                    <button ref={buttonAnswer_1}
+                            className="button-answer"
+                            onClick={() => buttonAnswerClick(1)}>{answer_1}</button>
+                    <button ref={buttonAnswer_2}
+                            className="button-answer"
+                            onClick={() => buttonAnswerClick(2)}>{answer_2}</button>
                 </div>
                 <div>
-                    <button ref={buttonAnswer_3} className="button-answer" onClick={() => buttonAnswerClick(3)}>{answer_3}</button>
-                    <button ref={buttonAnswer_4} className="button-answer" onClick={() => buttonAnswerClick(4)}>{answer_4}</button>
+                    <button ref={buttonAnswer_3}
+                            className="button-answer"
+                            onClick={() => buttonAnswerClick(3)}>{answer_3}</button>
+                    <button ref={buttonAnswer_4}
+                            className="button-answer"
+                            onClick={() => buttonAnswerClick(4)}>{answer_4}</button>
                 </div>
                 <button onClick={() => setIsStartPage(true)}>Back to start menu</button>
             </div>
