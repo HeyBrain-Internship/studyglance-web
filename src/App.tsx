@@ -1,9 +1,14 @@
 import React, { useRef, useState } from "react";
 import "./App.css";
 
+//https://studyglance.space/api
+
+const URL = "https://studyglance.space/api";
+
 function MainPage()
 {
     type Data = [number, string, string, string, string, string, string, string, string, string, number][];
+
 
     const [isStartPage, setIsStartPage]       = useState<boolean>(true);
     const [selectedItem, setSelectedItem]     = useState("");
@@ -18,6 +23,7 @@ function MainPage()
                                                  "Grade 6",
                                                  "Grade 7",
                                                  "Grade 8"];
+    const [questionID, setQuestionID]         = useState<number>(0);
     const [title, setTitle]                   = useState<string>("");
     const [question, setQuestion]             = useState<string>("");
     const [answer_1, setAnswer_1]             = useState<string>("");
@@ -34,6 +40,7 @@ function MainPage()
     const buttonAnswer_3                      = useRef<HTMLButtonElement>(null);
     const buttonAnswer_4                      = useRef<HTMLButtonElement>(null);
 
+
     const handleChange = (event : React.ChangeEvent<HTMLSelectElement>) =>
     {
         setSelectedItem(event.target.value);
@@ -47,7 +54,7 @@ function MainPage()
         //@formatter:off
         switch (selectedItem)
         {
-            case "Kindergarten": grade = "grade-kindergarten"; break;
+            case "Grade Kindergarten": grade = "grade-kindergarten"; break;
             case "Grade 1": grade = "grade-1"; break;
             case "Grade 2": grade = "grade-2"; break;
             case "Grade 3": grade = "grade-3"; break;
@@ -56,18 +63,29 @@ function MainPage()
             case "Grade 6": grade = "grade-6"; break;
             case "Grade 7": grade = "grade-7"; break;
             case "Grade 8": grade = "grade-8"; break;
-            default: grade = "grade-kindergarten"; break;
+            default: grade = ""; break;
         }
+
+        if (grade === "")
+        {
+            alert("Please choose the grade");
+            stop();
+        }
+
         //@formatter:on
 
         try
         {
-            const response     = await fetch("https://studyglance.space/api/get-" + grade);
+            console.log(URL + "/get-" + grade);
+            const response     = await fetch(URL + "/get-" + grade);
+
+
             const dataImported = await response.json();
             const newData      = dataImported["receivedData"];
 
             setData(newData);
-            setTitle(`${newData[0][2]} / ${newData[0][3]} / ${newData[0][4]}`);
+            setQuestionID(Number(newData[0][0]));
+            setTitle(`Grade ${newData[0][1]} / ${newData[0][2]} / ${newData[0][3]} / ${newData[0][4]} / Question ID: ${newData[0][0]}`);
             setQuestion(`${newData[0][5]}`);
             setAnswer_1(`${newData[0][6]}`);
             setAnswer_2(`${newData[0][7]}`);
@@ -83,24 +101,34 @@ function MainPage()
         setIsStartPage(false);
     }
 
-    const buttonAnswerClick = (selectedAnswer : number) =>
+    const buttonAnswerClick = async (selectedAnswer : number) =>
     {
         if (selectedAnswer === answerRight)
         {
             setResult({ message : "Right!", color : "lightgreen" });
             setTimeout(() => nextQuestion(), 2000);
+
+            try
+            {
+                fetch(URL + "/answer/" + questionID + "-1");
+            }
+            catch (error)
+            {
+                console.log(error);
+            }
         }
         else
         {
             //@formatter:off
             switch (answerRight)
             {
-                case 1: setResult({ message : `Wrong! Right answer is: ${answer_1}`, color : "red" }); break;
-                case 2: setResult({ message : `Wrong! Right answer is: ${answer_2}`, color : "red" }); break;
-                case 3: setResult({ message : `Wrong! Right answer is: ${answer_3}`, color : "red" }); break;
-                case 4: setResult({ message : `Wrong! Right answer is: ${answer_4}`, color : "red" }); break;
+                case 1: setResult({ message : `Wrong! Right answer is:\u0020\u0020\u0020\u0020${answer_1}`, color : "red" }); break;
+                case 2: setResult({ message : `Wrong! Right answer is:\u0020\u0020\u0020\u0020${answer_2}`, color : "red" }); break;
+                case 3: setResult({ message : `Wrong! Right answer is:\u0020\u0020\u0020\u0020${answer_3}`, color : "red" }); break;
+                case 4: setResult({ message : `Wrong! Right answer is:\u0020\u0020\u0020\u0020${answer_4}`, color : "red" }); break;
             }
             //@formatter:on
+            fetch(URL + "/answer/" + questionID + "-0");
             setTimeout(() => nextQuestion(), 3000);
         }
 
@@ -122,7 +150,8 @@ function MainPage()
             setQuestionNumber(nextQuestionNumber);
 
             const nextData = data[nextQuestionNumber];
-            setTitle(`${nextData[2]} / ${nextData[3]} / ${nextData[4]}`);
+            setQuestionID(Number(nextData[0]));
+            setTitle(`Grade ${nextData[1]} / ${nextData[2]} / ${nextData[3]} / ${nextData[4]} / Question ID: ${nextData[0]}`);
             setQuestion(nextData[5]);
             setAnswer_1(nextData[6]);
             setAnswer_2(nextData[7]);
